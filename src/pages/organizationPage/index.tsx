@@ -4,11 +4,8 @@ import {otherFontsSM, tabletSpace} from "../../app/theme/variables";
 import {textLargeSemiBoldStyles} from "../../shared/styles/Text";
 import Table from "../../widgets/table/Table";
 import {ReactComponent as SearchIcon} from './../../shared/icons/search.svg'
-import {useGetUsersQuery} from "../../shared/api";
 
 const OrganizationPage = () => {
-    const {data} = useGetUsersQuery({})
-
     return (
         <OrganizationPageWrapper>
             <PageTitle>
@@ -22,7 +19,7 @@ const OrganizationPage = () => {
                     <SearchIcon/>
                     <StyledInput type={'search'} placeholder={'Поиск'}/>
                 </InputContainer>
-                {data ? <Table data={data?.data}/> : <></>}
+                <Table/>
             </PageContent>
         </OrganizationPageWrapper>
     );

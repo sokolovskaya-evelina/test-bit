@@ -2,15 +2,16 @@ import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 
 export const userApi = createApi({
     reducerPath: 'post',
-    baseQuery:fetchBaseQuery({baseUrl:'https://test.gefara.xyz/api/v1/'}),
+    baseQuery: fetchBaseQuery({baseUrl: 'https://test.gefara.xyz/api/v1/'}),
     endpoints: (build) => ({
-        getUsers: build.query<UserResponseType, { page?: number, search?: string }>({
-            query: ({page = 1, search = ''}) => ({
+        getUsers: build.query<UserResponseType, IQuery>({
+            query: ({page = 1, search = '', orderBy = ''}) => ({
                 url: '/user/list',
                 params:
                     {
                         page,
                         search,
+                        orderBy: `tokens:${orderBy}`
                     }
             })
         }),
@@ -35,6 +36,14 @@ export interface IUser {
 type UserResponseType = {
     data: IUser[]
     pages: number
+}
+
+export type OrderType = 'asc' | 'desc'
+
+export interface IQuery {
+    page?: number
+    search?: string
+    orderBy?: OrderType
 }
 
 export const {useGetUsersQuery} = userApi

@@ -1,17 +1,23 @@
-import React, {FC} from 'react';
+import React, {FC, useState} from 'react';
 import styled from "styled-components";
 import {desktopSpace, mobileSpace} from "../../app/theme/variables";
 import {textSmallMediumStyles} from "../../shared/styles/Text";
-import {IUser} from "../../shared/api";
+import {IQuery, IUser, OrderType, useGetUsersQuery} from "../../shared/api";
 import {ReactComponent as EditIcon} from './../../shared/icons/edit.svg'
 import {ReactComponent as TrashIcon} from './../../shared/icons/trash.svg'
 import {ReactComponent as ArrowDown} from './../../shared/icons/arrowDown.svg'
 
 type Props = {
-    data: IUser[]
 }
 
-const Table: FC<Props> = ({data}) => {
+const Table: FC<Props> = () => {
+    const [{orderBy, search, page}, setQuery] = useState<IQuery>({search: undefined, orderBy: undefined, page: 1})
+    const {data} = useGetUsersQuery({search, orderBy, page})
+
+    const changeOrder = (orderBy: OrderType) => {
+        setQuery(prevState => ({...prevState, orderBy}))
+    }
+
     return (
         <TableWrapper>
             <StyledTable>
@@ -22,7 +28,7 @@ const Table: FC<Props> = ({data}) => {
                     <StyledTableRowItem>Роль</StyledTableRowItem>
                     <StyledTableRowItem>Подписка</StyledTableRowItem>
                     <StyledTableRowItem>
-                        <ActionsContainer>
+                        <ActionsContainer orderBy={orderBy} onClick={() => changeOrder(orderBy !== 'asc' ? 'asc' : 'desc')}>
                             <span>Токены</span>
                             <ArrowDown/>
                         </ActionsContainer>
@@ -30,7 +36,7 @@ const Table: FC<Props> = ({data}) => {
                     <StyledTableRowItem>Действия</StyledTableRowItem>
                 </StyledTableHeaderRow>
                 </thead>
-                {data.map((item) => {
+                {data ? data.data.map((item: IUser) => {
                     return <StyledTableRow key={item.id}>
                         <StyledTableRowItem>{item.email}</StyledTableRowItem>
                         <StyledTableRowItem>{item.name}</StyledTableRowItem>
@@ -44,7 +50,7 @@ const Table: FC<Props> = ({data}) => {
                             </ActionsContainer>
                         </StyledTableRowItem>
                     </StyledTableRow>
-                })}
+                }) : null}
             </StyledTable>
         </TableWrapper>
 
@@ -77,11 +83,17 @@ const StyledTableRow = styled.tr`
   border-bottom: 1px solid ${p => p.theme.colors.gray3};
 `
 
-const ActionsContainer = styled.div`
+const ActionsContainer = styled.div<{ orderBy?: OrderType }>`
   display: flex;
   justify-content: center;
   align-items: center;
   gap: ${mobileSpace.lvl1};
+  
+  svg {
+    transition: .2s;
+    rotate: ${p => p.orderBy === 'asc' ? '180deg' : '0deg'};
+    fill: ${p => !!p.orderBy ? p.theme.colors.primary : p.theme.colors.gray1};
+  }
 `
 
 export default Table;
