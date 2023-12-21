@@ -1,56 +1,55 @@
-import React, {FC, useState} from 'react';
+import React, {FC} from 'react';
 import styled from "styled-components";
 import {desktopSpace, mobileSpace} from "../../app/theme/variables";
 import {textSmallMediumStyles} from "../../shared/styles/Text";
-import {IQuery, IUser, OrderType, useGetUsersQuery} from "../../shared/api";
+import {IUser, OrderType} from "../../shared/api";
 import {ReactComponent as EditIcon} from './../../shared/icons/edit.svg'
 import {ReactComponent as TrashIcon} from './../../shared/icons/trash.svg'
 import {ReactComponent as ArrowDown} from './../../shared/icons/arrowDown.svg'
 
 type Props = {
+    data: IUser[]
+    onClick: () => void
+    orderBy: OrderType | undefined
 }
 
-const Table: FC<Props> = () => {
-    const [{orderBy, search, page}, setQuery] = useState<IQuery>({search: undefined, orderBy: undefined, page: 1})
-    const {data} = useGetUsersQuery({search, orderBy, page})
-
-    const changeOrder = (orderBy: OrderType) => {
-        setQuery(prevState => ({...prevState, orderBy}))
-    }
+const Table: FC<Props> = ({data, onClick, orderBy}) => {
 
     return (
         <TableWrapper>
             <StyledTable>
                 <thead>
-                <StyledTableHeaderRow>
-                    <StyledTableRowItem>Email</StyledTableRowItem>
-                    <StyledTableRowItem>Имя</StyledTableRowItem>
-                    <StyledTableRowItem>Роль</StyledTableRowItem>
-                    <StyledTableRowItem>Подписка</StyledTableRowItem>
-                    <StyledTableRowItem>
-                        <ActionsContainer orderBy={orderBy} onClick={() => changeOrder(orderBy !== 'asc' ? 'asc' : 'desc')}>
-                            <span>Токены</span>
-                            <ArrowDown/>
-                        </ActionsContainer>
-                    </StyledTableRowItem>
-                    <StyledTableRowItem>Действия</StyledTableRowItem>
-                </StyledTableHeaderRow>
-                </thead>
-                {data ? data.data.map((item: IUser) => {
-                    return <StyledTableRow key={item.id}>
-                        <StyledTableRowItem>{item.email}</StyledTableRowItem>
-                        <StyledTableRowItem>{item.name}</StyledTableRowItem>
-                        <StyledTableRowItem>{item.role}</StyledTableRowItem>
-                        <StyledTableRowItem>{item.subscription.plan.type}</StyledTableRowItem>
-                        <StyledTableRowItem>{item.subscription.tokens} TKN</StyledTableRowItem>
+                    <StyledTableHeaderRow>
+                        <StyledTableRowItem>Email</StyledTableRowItem>
+                        <StyledTableRowItem>Имя</StyledTableRowItem>
+                        <StyledTableRowItem>Роль</StyledTableRowItem>
+                        <StyledTableRowItem>Подписка</StyledTableRowItem>
                         <StyledTableRowItem>
-                            <ActionsContainer>
-                                <EditIcon/>
-                                <TrashIcon/>
+                            <ActionsContainer $orderBy={orderBy} onClick={onClick}>
+                                <span>Токены</span>
+                                <ArrowDown/>
                             </ActionsContainer>
                         </StyledTableRowItem>
-                    </StyledTableRow>
-                }) : null}
+                        <StyledTableRowItem>Действия</StyledTableRowItem>
+                    </StyledTableHeaderRow>
+                </thead>
+                <tbody>
+                    {data ? data.map((item: IUser) => {
+                        return <StyledTableRow key={item.id}>
+                            <StyledTableRowItem>{item.email}</StyledTableRowItem>
+                            <StyledTableRowItem>{item.name}</StyledTableRowItem>
+                            <StyledTableRowItem>{item.role}</StyledTableRowItem>
+                            <StyledTableRowItem>{item.subscription.plan.type}</StyledTableRowItem>
+                            <StyledTableRowItem>{item.subscription.tokens} TKN</StyledTableRowItem>
+                            <StyledTableRowItem>
+                                <ActionsContainer>
+                                    <EditIcon/>
+                                    <TrashIcon/>
+                                </ActionsContainer>
+                            </StyledTableRowItem>
+                        </StyledTableRow>
+                    }) : null}
+                </tbody>
             </StyledTable>
         </TableWrapper>
 
@@ -59,6 +58,7 @@ const Table: FC<Props> = () => {
 
 const TableWrapper = styled.div`
   overflow: auto;
+  margin-bottom: 24px;
 `
 
 const StyledTable = styled.table`
@@ -83,7 +83,7 @@ const StyledTableRow = styled.tr`
   border-bottom: 1px solid ${p => p.theme.colors.gray3};
 `
 
-const ActionsContainer = styled.div<{ orderBy?: OrderType }>`
+const ActionsContainer = styled.div<{ $orderBy?: OrderType }>`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -91,8 +91,8 @@ const ActionsContainer = styled.div<{ orderBy?: OrderType }>`
   
   svg {
     transition: .2s;
-    rotate: ${p => p.orderBy === 'asc' ? '180deg' : '0deg'};
-    fill: ${p => !!p.orderBy ? p.theme.colors.primary : p.theme.colors.gray1};
+    rotate: ${p => p.$orderBy === 'asc' ? '180deg' : '0deg'};
+    fill: ${p => !!p.$orderBy ? p.theme.colors.primary : p.theme.colors.gray1};
   }
 `
 

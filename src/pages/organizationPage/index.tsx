@@ -1,11 +1,32 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import styled from "styled-components";
 import {otherFontsSM, tabletSpace} from "../../app/theme/variables";
-import {textLargeSemiBoldStyles} from "../../shared/styles/Text";
+import {textLargeSemiBoldStyles, textMediumMediumStyles} from "../../shared/styles/Text";
 import Table from "../../widgets/table/Table";
 import {ReactComponent as SearchIcon} from './../../shared/icons/search.svg'
+import {ReactComponent as PrevIcon} from './../../shared/icons/arrowLeft.svg'
+import {ReactComponent as NextIcon} from './../../shared/icons/arrowRight.svg'
+import ReactPaginate from "react-paginate";
+import {IQuery, useGetUsersQuery} from "../../shared/api";
 
 const OrganizationPage = () => {
+    const [{page, orderBy, search}, setQuery] = useState<IQuery>({page: 1, orderBy: undefined, search: undefined})
+    const {data} = useGetUsersQuery({page, orderBy, search})
+
+    const changeOrder = () => {
+        setQuery(prevState => ({...prevState, orderBy: prevState.orderBy !== 'asc' ? 'asc' : 'desc'}))
+    }
+
+    const changeSearch = () => {
+
+    }
+
+    const changePage = useCallback((item: { selected: number }) => {
+        if (page !== item.selected + 1) {
+            setQuery(prevState => ({...prevState, page: item.selected + 1}))
+        }
+    }, [page])
+
     return (
         <OrganizationPageWrapper>
             <PageTitle>
@@ -19,7 +40,13 @@ const OrganizationPage = () => {
                     <SearchIcon/>
                     <StyledInput type={'search'} placeholder={'Поиск'}/>
                 </InputContainer>
-                <Table/>
+                {data && <Table data={data?.data} orderBy={orderBy} onClick={changeOrder}/>}
+                <StyledPaginate
+                    pageCount={data?.pages ? data.pages : 1}
+                    previousLabel={<PrevIcon/>}
+                    nextLabel={<NextIcon/>}
+                    onPageChange={changePage}
+                />
             </PageContent>
         </OrganizationPageWrapper>
     );
@@ -44,8 +71,8 @@ const PageDescription = styled.span`
 `
 
 const InputContainer = styled.div`
-    position: relative;
-  
+  position: relative;
+
   svg {
     position: absolute;
     top: 16px;
@@ -86,5 +113,47 @@ const PageContent = styled.div`
   flex-direction: column;
   padding: 30px;
 `
+
+const StyledPaginate = styled(ReactPaginate)`
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  justify-content: center;
+  align-items: center;
+
+  li {
+    a {
+      ${textMediumMediumStyles};
+      padding: 6px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    &.previous, &.next {
+      a {
+        padding: 6px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+
+        svg {
+          width: ${p => p.theme.variables.constLvl2};
+          height: ${p => p.theme.variables.constLvl2};
+          fill: ${p => p.theme.colors.gray1};
+        }
+      }
+    }
+
+
+    &.selected {
+      border-radius: 8px;
+      background: ${p => p.theme.colors.primary};
+      color: ${p => p.theme.colors.baseWhite};
+    }
+  }
+`;
 
 export default OrganizationPage;
