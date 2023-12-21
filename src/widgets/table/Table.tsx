@@ -1,41 +1,63 @@
-import React from 'react';
+import React, {FC} from 'react';
 import styled from "styled-components";
-import {desktopSpace} from "../../app/theme/variables";
+import {desktopSpace, mobileSpace} from "../../app/theme/variables";
 import {textSmallMediumStyles} from "../../shared/styles/Text";
+import {IUser} from "../../shared/api";
+import {ReactComponent as EditIcon} from './../../shared/icons/edit.svg'
+import {ReactComponent as TrashIcon} from './../../shared/icons/trash.svg'
+import {ReactComponent as ArrowDown} from './../../shared/icons/arrowDown.svg'
 
-const Table = () => {
+type Props = {
+    data: IUser[]
+}
+
+const Table: FC<Props> = ({data}) => {
     return (
-        <StyledTable>
-            <StyledTableHeaderRow>
-                <StyledTableRowItem>Email</StyledTableRowItem>
-                <StyledTableRowItem>Имя</StyledTableRowItem>
-                <StyledTableRowItem>Роль</StyledTableRowItem>
-                <StyledTableRowItem>Подписка</StyledTableRowItem>
-                <StyledTableRowItem>Токены</StyledTableRowItem>
-                <StyledTableRowItem>Действия</StyledTableRowItem>
-            </StyledTableHeaderRow>
-            <StyledTableRow>
-                <StyledTableRowItem>34,5</StyledTableRowItem>
-                <StyledTableRowItem>3,5</StyledTableRowItem>
-                <StyledTableRowItem>36</StyledTableRowItem>
-                <StyledTableRowItem>23</StyledTableRowItem>
-                <StyledTableRowItem>23</StyledTableRowItem>
-                <StyledTableRowItem>23</StyledTableRowItem>
-            </StyledTableRow>
-            <StyledTableRow>
-                <StyledTableRowItem>35,5</StyledTableRowItem>
-                <StyledTableRowItem>4</StyledTableRowItem>
-                <StyledTableRowItem>36⅔</StyledTableRowItem>
-                <StyledTableRowItem>36⅔</StyledTableRowItem>
-                <StyledTableRowItem>36⅔</StyledTableRowItem>
-                <StyledTableRowItem>23–23,5</StyledTableRowItem>
-            </StyledTableRow>
-        </StyledTable>
+        <TableWrapper>
+            <StyledTable>
+                <thead>
+                <StyledTableHeaderRow>
+                    <StyledTableRowItem>Email</StyledTableRowItem>
+                    <StyledTableRowItem>Имя</StyledTableRowItem>
+                    <StyledTableRowItem>Роль</StyledTableRowItem>
+                    <StyledTableRowItem>Подписка</StyledTableRowItem>
+                    <StyledTableRowItem>
+                        <ActionsContainer>
+                            <span>Токены</span>
+                            <ArrowDown/>
+                        </ActionsContainer>
+                    </StyledTableRowItem>
+                    <StyledTableRowItem>Действия</StyledTableRowItem>
+                </StyledTableHeaderRow>
+                </thead>
+                {data.map((item) => {
+                    return <StyledTableRow key={item.id}>
+                        <StyledTableRowItem>{item.email}</StyledTableRowItem>
+                        <StyledTableRowItem>{item.name}</StyledTableRowItem>
+                        <StyledTableRowItem>{item.role}</StyledTableRowItem>
+                        <StyledTableRowItem>{item.subscription.plan.type}</StyledTableRowItem>
+                        <StyledTableRowItem>{item.subscription.tokens} TKN</StyledTableRowItem>
+                        <StyledTableRowItem>
+                            <ActionsContainer>
+                                <EditIcon/>
+                                <TrashIcon/>
+                            </ActionsContainer>
+                        </StyledTableRowItem>
+                    </StyledTableRow>
+                })}
+            </StyledTable>
+        </TableWrapper>
+
     );
 };
 
+const TableWrapper = styled.div`
+  overflow: auto;
+`
+
 const StyledTable = styled.table`
-border-collapse: collapse;
+  border-collapse: collapse;
+  width: 100%;
 `
 
 const StyledTableHeaderRow = styled.tr`
@@ -53,6 +75,13 @@ const StyledTableRowItem = styled.td`
 const StyledTableRow = styled.tr`
   text-align: center;
   border-bottom: 1px solid ${p => p.theme.colors.gray3};
+`
+
+const ActionsContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: ${mobileSpace.lvl1};
 `
 
 export default Table;
