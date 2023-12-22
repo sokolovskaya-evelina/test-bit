@@ -6,6 +6,7 @@ import {IUser, OrderType} from "../../shared/api";
 import {ReactComponent as EditIcon} from './../../shared/icons/edit.svg'
 import {ReactComponent as TrashIcon} from './../../shared/icons/trash.svg'
 import {ReactComponent as ArrowDown} from './../../shared/icons/arrowDown.svg'
+import EmptyMessageText from "../../shared/ui/notification/EmptyMessageText";
 
 type Props = {
     data: IUser[]
@@ -19,36 +20,40 @@ const Table: FC<Props> = ({data, onClick, orderBy}) => {
         <TableWrapper>
             <StyledTable>
                 <thead>
-                    <StyledTableHeaderRow>
-                        <StyledTableRowItem>Email</StyledTableRowItem>
-                        <StyledTableRowItem>Имя</StyledTableRowItem>
-                        <StyledTableRowItem>Роль</StyledTableRowItem>
-                        <StyledTableRowItem>Подписка</StyledTableRowItem>
-                        <StyledTableRowItem>
-                            <ActionsContainer $orderBy={orderBy} onClick={onClick}>
-                                <span>Токены</span>
-                                <ArrowDown/>
-                            </ActionsContainer>
-                        </StyledTableRowItem>
-                        <StyledTableRowItem>Действия</StyledTableRowItem>
-                    </StyledTableHeaderRow>
+                <StyledTableHeaderRow>
+                    <StyledTableRowItem>Email</StyledTableRowItem>
+                    <StyledTableRowItem>Имя</StyledTableRowItem>
+                    <StyledTableRowItem>Роль</StyledTableRowItem>
+                    <StyledTableRowItem>Подписка</StyledTableRowItem>
+                    <StyledTableRowItem>
+                        <ActionsContainer $orderBy={orderBy} onClick={onClick}>
+                            <span>Токены</span>
+                            <ArrowDown/>
+                        </ActionsContainer>
+                    </StyledTableRowItem>
+                    <StyledTableRowItem>Действия</StyledTableRowItem>
+                </StyledTableHeaderRow>
                 </thead>
                 <tbody>
-                    {data ? data.map((item: IUser) => {
-                        return <StyledTableRow key={item.id}>
-                            <StyledTableRowItem>{item.email}</StyledTableRowItem>
-                            <StyledTableRowItem>{item.name}</StyledTableRowItem>
-                            <StyledTableRowItem>{item.role}</StyledTableRowItem>
-                            <StyledTableRowItem>{item.subscription.plan.type}</StyledTableRowItem>
-                            <StyledTableRowItem>{item.subscription.tokens} TKN</StyledTableRowItem>
-                            <StyledTableRowItem>
-                                <ActionsContainer>
-                                    <EditIcon/>
-                                    <TrashIcon/>
-                                </ActionsContainer>
-                            </StyledTableRowItem>
-                        </StyledTableRow>
-                    }) : null}
+                {data.length >= 1 ? data.map((item: IUser) => {
+                    return <StyledTableRow key={item.id}>
+                        <StyledTableRowItem>{item.email}</StyledTableRowItem>
+                        <StyledTableRowItem>{item.name}</StyledTableRowItem>
+                        <StyledTableRowItem>{item.role}</StyledTableRowItem>
+                        <StyledTableRowItem>{item.subscription.plan.type}</StyledTableRowItem>
+                        <StyledTableRowItem>{item.subscription.tokens} TKN</StyledTableRowItem>
+                        <StyledTableRowItem>
+                            <ActionsContainer>
+                                <EditIcon/>
+                                <TrashIcon/>
+                            </ActionsContainer>
+                        </StyledTableRowItem>
+                    </StyledTableRow>
+                }) : <StyledTableRow>
+                    <StyledTableRowItem colSpan={6}>
+                        <EmptyMessageText>Пользователи не найдены</EmptyMessageText>
+                    </StyledTableRowItem>
+                </StyledTableRow>}
                 </tbody>
             </StyledTable>
         </TableWrapper>
@@ -88,7 +93,7 @@ const ActionsContainer = styled.div<{ $orderBy?: OrderType }>`
   justify-content: center;
   align-items: center;
   gap: ${mobileSpace.lvl1};
-  
+
   svg {
     transition: .2s;
     rotate: ${p => p.$orderBy === 'asc' ? '180deg' : '0deg'};

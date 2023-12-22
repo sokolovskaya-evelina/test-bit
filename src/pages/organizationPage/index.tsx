@@ -9,11 +9,12 @@ import {ReactComponent as NextIcon} from './../../shared/icons/arrowRight.svg'
 import ReactPaginate from "react-paginate";
 import {IQuery, useGetUsersQuery} from "../../shared/api";
 import Notification from "../../shared/ui/notification/Notification";
+import EmptyMessageText from "../../shared/ui/notification/EmptyMessageText";
 
 const OrganizationPage = () => {
     const [{page, orderBy, search}, setQuery] = useState<IQuery>({page: 1, orderBy: undefined, search: undefined})
     const [isOpen, setIsOpen] = useState(false)
-    const {data, error} = useGetUsersQuery({page, orderBy, search})
+    const {data, error, isLoading} = useGetUsersQuery({page, orderBy, search})
 
     useEffect(() => {
         if (error) {
@@ -51,13 +52,17 @@ const OrganizationPage = () => {
                     <SearchIcon/>
                     <StyledInput value={search} onChange={changeSearch} type={'search'} placeholder={'Поиск'}/>
                 </InputContainer>
-                {data && <Table data={data?.data} orderBy={orderBy} onClick={changeOrder}/>}
-                <StyledPaginate
-                    pageCount={data?.pages ? data.pages : 1}
-                    previousLabel={<PrevIcon/>}
-                    nextLabel={<NextIcon/>}
-                    onPageChange={changePage}
-                />
+                {data && !isLoading
+                    ? <Table data={data?.data} orderBy={orderBy} onClick={changeOrder}/>
+                    : <EmptyMessageText>Данные не найдены</EmptyMessageText>}
+                {
+                    data && <StyledPaginate
+										pageCount={data?.pages ? data.pages : 1}
+										previousLabel={<PrevIcon/>}
+										nextLabel={<NextIcon/>}
+										onPageChange={changePage}
+									/>
+                }
             </PageContent>
             {
                 isOpen && <Notification onClose={() => setIsOpen(false)} status={'error'}/>
@@ -152,7 +157,6 @@ const StyledPaginate = styled(ReactPaginate)`
         align-items: center;
         justify-content: center;
 
-
         svg {
           width: ${p => p.theme.variables.constLvl2};
           height: ${p => p.theme.variables.constLvl2};
@@ -160,7 +164,6 @@ const StyledPaginate = styled(ReactPaginate)`
         }
       }
     }
-
 
     &.selected {
       border-radius: 8px;
