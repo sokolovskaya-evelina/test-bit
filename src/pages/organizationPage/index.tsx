@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useCallback, useState} from 'react';
+import React, {ChangeEvent, useCallback, useEffect, useState} from 'react';
 import styled from "styled-components";
 import {otherFontsSM, tabletSpace} from "../../app/theme/variables";
 import {textLargeSemiBoldStyles, textMediumMediumStyles} from "../../shared/styles/Text";
@@ -8,10 +8,21 @@ import {ReactComponent as PrevIcon} from './../../shared/icons/arrowLeft.svg'
 import {ReactComponent as NextIcon} from './../../shared/icons/arrowRight.svg'
 import ReactPaginate from "react-paginate";
 import {IQuery, useGetUsersQuery} from "../../shared/api";
+import Notification from "../../shared/ui/notification/Notification";
 
 const OrganizationPage = () => {
     const [{page, orderBy, search}, setQuery] = useState<IQuery>({page: 1, orderBy: undefined, search: undefined})
-    const {data} = useGetUsersQuery({page, orderBy, search})
+    const [isOpen, setIsOpen] = useState(false)
+    const {data, error} = useGetUsersQuery({page, orderBy, search})
+
+    useEffect(() => {
+        if (error) {
+            setIsOpen(true)
+            setTimeout(() => {
+                setIsOpen(false)
+            }, 5000)
+        }
+    }, [error])
 
     const changeOrder = () => {
         setQuery(prevState => ({...prevState, orderBy: prevState.orderBy !== 'asc' ? 'asc' : 'desc'}))
@@ -48,6 +59,9 @@ const OrganizationPage = () => {
                     onPageChange={changePage}
                 />
             </PageContent>
+            {
+                isOpen && <Notification onClose={() => setIsOpen(false)} status={'error'}/>
+            }
         </OrganizationPageWrapper>
     );
 };
@@ -137,7 +151,7 @@ const StyledPaginate = styled(ReactPaginate)`
         display: flex;
         align-items: center;
         justify-content: center;
-        
+
 
         svg {
           width: ${p => p.theme.variables.constLvl2};
