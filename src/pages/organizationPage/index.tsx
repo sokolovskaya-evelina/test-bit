@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {ChangeEvent, useCallback, useState} from 'react';
 import styled from "styled-components";
 import {otherFontsSM, tabletSpace} from "../../app/theme/variables";
 import {textLargeSemiBoldStyles, textMediumMediumStyles} from "../../shared/styles/Text";
@@ -17,8 +17,8 @@ const OrganizationPage = () => {
         setQuery(prevState => ({...prevState, orderBy: prevState.orderBy !== 'asc' ? 'asc' : 'desc'}))
     }
 
-    const changeSearch = () => {
-
+    const changeSearch = (e: ChangeEvent<HTMLInputElement>) => {
+        setQuery(prevState => ({...prevState, search: e.target.value}))
     }
 
     const changePage = useCallback((item: { selected: number }) => {
@@ -38,7 +38,7 @@ const OrganizationPage = () => {
                 </PageDescription>
                 <InputContainer>
                     <SearchIcon/>
-                    <StyledInput type={'search'} placeholder={'Поиск'}/>
+                    <StyledInput value={search} onChange={changeSearch} type={'search'} placeholder={'Поиск'}/>
                 </InputContainer>
                 {data && <Table data={data?.data} orderBy={orderBy} onClick={changeOrder}/>}
                 <StyledPaginate
