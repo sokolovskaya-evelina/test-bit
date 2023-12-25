@@ -17,7 +17,6 @@ type Props = {
     orderBy: OrderType | undefined
 }
 
-
 const Table: FC<Props> = ({data, onClick, orderBy}) => {
     const [drawerIsOpen, setDrawerIsOpen] = useState(false)
     const [userEmail, setUserEmail] = useState('')
